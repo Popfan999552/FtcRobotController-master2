@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,9 +19,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 @Autonomous(name = "Signal Sleeve Test")
+@Disabled
 public class VisionTest extends LinearOpMode {
 
-    CENTERSTAGEROBOT drive;
+    //CENTERSTAGEROBOT drive;
    /* DcMotor slide;
     DcMotor roller;
 
@@ -41,7 +43,7 @@ public class VisionTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //hardware map
-        drive = new CENTERSTAGEROBOT(hardwareMap);
+        //drive = new CENTERSTAGEROBOT(hardwareMap);
         /*slide=hardwareMap.dcMotor.get("slide");
         v4b=hardwareMap.servo.get("v4b");
         roller=hardwareMap.dcMotor.get("roller");*/
@@ -77,6 +79,11 @@ public class VisionTest extends LinearOpMode {
         }*/
 
         waitForStart();
+        while (opModeIsActive()) {
+            telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
+            telemetry.update();
+            sleep(100);
+        }
         if(pixelpos== SleeveDetection.ParkingPosition.LEFT){
 
             //drive.followTrajectory(trajToSpike);

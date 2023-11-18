@@ -37,6 +37,7 @@ import java.util.List;
  */
 
 @Autonomous(name= "opencvSkystoneDetector", group="Sky autonomous")
+@Disabled
 public class opencvPixelDetector extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 

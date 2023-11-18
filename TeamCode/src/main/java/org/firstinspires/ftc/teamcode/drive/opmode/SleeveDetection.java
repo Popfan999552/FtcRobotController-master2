@@ -1,11 +1,19 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -16,6 +24,7 @@ public class SleeveDetection extends OpenCvPipeline {
     MAGENTA = Parking Right
      */
 
+
     public enum ParkingPosition {
         LEFT,
         CENTER,
@@ -23,15 +32,15 @@ public class SleeveDetection extends OpenCvPipeline {
     }
 
     // TOPLEFT anchor point for the bounding box
-    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(500, 368);
+    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(0, 20);
 
-    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(145, 200);
+    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(100, 20);
     // Width and height for the bounding box
-    public static int REGION_WIDTH = 140;
-    public static int REGION_HEIGHT = 50;
+    public static int REGION_WIDTH = 90;
+    public static int REGION_HEIGHT = 10;
 
-    public static int rREGION_WIDTH = 80;
-    public static int rREGION_HEIGHT = 150;
+    public static int rREGION_WIDTH = 90;
+    public static int rREGION_HEIGHT = 10;
 
     // Color definitions
     /*private final Scalar
@@ -63,6 +72,7 @@ public class SleeveDetection extends OpenCvPipeline {
     private volatile ParkingPosition position = ParkingPosition.LEFT;
 
     @Override
+
     public Mat processFrame(Mat input) {
         // Get the submat frame, and then sum all the values
         /*Mat areaMatleft = input.submat(new Rect(sleeve_pointA, sleeve_pointB));
@@ -75,11 +85,11 @@ public class SleeveDetection extends OpenCvPipeline {
 
         Mat areaMatmid = input.submat(new Rect(sleeve_pointA, sleeve_pointB));
         Scalar sumColorsmid = Core.sumElems(areaMatmid);
-        double minColormid = Math.max(sumColorsmid.val[0], Math.min(sumColorsmid.val[1], sumColorsmid.val[2]));
+        double minColormid = Math.min(sumColorsmid.val[0], Math.min(sumColorsmid.val[1], sumColorsmid.val[2]));
 
         Mat areaMatright = input.submat(new Rect(rsleeve_pointA, rsleeve_pointB));
         Scalar sumColorsright = Core.sumElems(areaMatright);
-        double minColorright = Math.max(sumColorsright.val[0], Math.min(sumColorsright.val[1], sumColorsright.val[2]));
+        double minColorright = Math.min(sumColorsright.val[0], Math.min(sumColorsright.val[1], sumColorsright.val[2]));
 
         // Get the minimum RGB value from every single channel
 
@@ -120,8 +130,55 @@ public class SleeveDetection extends OpenCvPipeline {
         return input;
     }
 
+    public Mat processFrameTest(Mat input)
+    {
+        //telemetry.addData("Status", "process frame");
+        Mat YCBCr = new Mat ();
+        Mat leftCrop;
+        Mat rightCrop;
+        double leftavgfin;
+        double rightavgfin;
+        Mat outPut = new Mat ();
+        Scalar rectColor = new Scalar(255.0,0.0,0.0);
+
+        Imgproc.cvtColor(input,YCBCr,Imgproc.COLOR_RGB2YCrCb);
+
+        Rect leftRect = new Rect (0, 0, 0, 0);
+        Rect rightRect = new Rect (0, 0, 0, 0);
+
+        input.copyTo(outPut);
+        Imgproc.rectangle(outPut, leftRect, rectColor, 0);
+        Imgproc.rectangle(outPut, rightRect, rectColor, 0);
+
+        leftCrop =YCBCr.submat(leftRect);
+        rightCrop =YCBCr.submat(rightRect);
+
+        Core.extractChannel(leftCrop, leftCrop, 0);
+        Core.extractChannel(rightCrop, rightCrop, 0);
+
+        Scalar leftavg = Core.mean(leftCrop);
+        Scalar rightavg = Core.mean(rightCrop);
+
+        Double leftavg_o = leftavg.val[0];
+        Double rightavgf_o = rightavg.val[0];
+
+        if (leftavg_o > rightavgf_o){
+            //telemetry.addLine("Left");
+        }
+        else{
+
+            //telemetry.addLine("Right");
+        }
+
+        return(outPut);
+
+        //return input;
+    }
+
     // Returns an enum being the current position where the robot will park
     public ParkingPosition getPosition() {
         return position;
     }
+
+
 }

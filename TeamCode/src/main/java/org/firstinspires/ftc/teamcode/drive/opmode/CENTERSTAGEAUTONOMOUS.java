@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -69,6 +70,7 @@ import java.util.ArrayList;
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
+@Disabled
 @Autonomous(group = "drive")
 public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
     public static double d = 11.5; // in
@@ -124,7 +126,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
                 .build();
         telemetry.addData("finalX", 2343);
         opencvPixelDetector pixelDetector = new opencvPixelDetector();
-        ;
+
 
         while(!isStopRequested()){
             pixelDetector.runOpMode();
@@ -135,8 +137,8 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
         //drive.followTrajectory();
         drive.followTrajectory(trajToSpike);
         //detect object and location
-        drive.turn(90);
-        drive.followTrajectory(trajSpikeToBb);
+        //drive.turn(90);
+        //drive.followTrajectory(trajSpikeToBb);
         //detect AprilTag
         //move 6'' left or right
 
