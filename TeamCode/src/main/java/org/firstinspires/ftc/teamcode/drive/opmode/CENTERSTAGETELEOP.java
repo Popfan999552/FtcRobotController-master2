@@ -1,20 +1,20 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.vision;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import org.firstinspires.ftc.teamcode.drive.CENTERSTAGEROBOT;
 
+@TeleOp(group = "drive")
 public class CENTERSTAGETELEOP extends OpMode {
     Gamepad previousGamepad;
     Gamepad currentGamepad;
     CENTERSTAGEROBOT drive = new CENTERSTAGEROBOT(hardwareMap);
-
     //DcMotor slide=drive.getSlide(hardwareMap);
     //Servo v4b=drive.getV4b(hardwareMap);
     float slidePower =0;

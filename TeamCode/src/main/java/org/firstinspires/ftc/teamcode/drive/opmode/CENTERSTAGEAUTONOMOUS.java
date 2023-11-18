@@ -201,6 +201,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
                         break;
                     }
                 }
+
                 if(tagOfInterest==null ) {
                     telemetry.addData("hi",3);
                     telemetry.update();
@@ -300,6 +301,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
                 telemetry.addData("over 50",3);
                 //servo.setPosition(180);
                 return;
+
                 // do something else
             }
         }
@@ -320,6 +322,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
+
     }
 }
 
