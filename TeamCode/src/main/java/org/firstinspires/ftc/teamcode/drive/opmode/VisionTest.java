@@ -21,8 +21,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class VisionTest extends LinearOpMode {
 
     CENTERSTAGEROBOT drive;
-    DcMotor slide;
-    Servo v4b;
+   /* DcMotor slide;
+    DcMotor roller;
+
+    Servo v4b;*/
 
     private SleeveDetection sleeveDetection;
     private OpenCvCamera camera;
@@ -40,8 +42,11 @@ public class VisionTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         //hardware map
         drive = new CENTERSTAGEROBOT(hardwareMap);
-        slide=hardwareMap.dcMotor.get("slide");
+        /*slide=hardwareMap.dcMotor.get("slide");
         v4b=hardwareMap.servo.get("v4b");
+        roller=hardwareMap.dcMotor.get("roller");*/
+
+
         //cv
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
@@ -60,8 +65,8 @@ public class VisionTest extends LinearOpMode {
             public void onError(int errorCode) {}
         });
         
-        v4b.setPosition(0);
-        slide.setPower(.2);
+        //v4b.setPosition(0);
+        //slide.setPower(.2);
         sleep(1000);
         telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
         SleeveDetection.ParkingPosition pixelpos = sleeveDetection.getPosition();
@@ -75,10 +80,14 @@ public class VisionTest extends LinearOpMode {
         if(pixelpos== SleeveDetection.ParkingPosition.LEFT){
 
             //drive.followTrajectory(trajToSpike);
+            //intake.setPower(0.1);
         } else if(pixelpos== SleeveDetection.ParkingPosition.CENTER){
             //drive.followTrajectory(trajToSpike);
+            //intake.setPower(0.1);
+
         }   else if(pixelpos== SleeveDetection.ParkingPosition.RIGHT){
             //drive.followTrajectory(trajToSpike);
+            //intake.setPower(0.1);
         }
         //park in all of them
 

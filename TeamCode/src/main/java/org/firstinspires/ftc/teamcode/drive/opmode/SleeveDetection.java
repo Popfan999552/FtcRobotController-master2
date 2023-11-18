@@ -23,9 +23,9 @@ public class SleeveDetection extends OpenCvPipeline {
     }
 
     // TOPLEFT anchor point for the bounding box
-    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(500, 200);
+    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(500, 368);
 
-    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(145, 168);
+    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(145, 200);
     // Width and height for the bounding box
     public static int REGION_WIDTH = 140;
     public static int REGION_HEIGHT = 50;
@@ -39,6 +39,7 @@ public class SleeveDetection extends OpenCvPipeline {
             BLUE    = new Scalar(0, 0, 255),
             BLACK = new Scalar(0, 0, 0);*/
     private final Scalar
+            RED  = new Scalar(255, 0, 0),
             YELLOW  = new Scalar(255, 255, 0),
             CYAN    = new Scalar(0, 255, 255),
             MAGENTA = new Scalar(255, 0, 255);
@@ -74,11 +75,11 @@ public class SleeveDetection extends OpenCvPipeline {
 
         Mat areaMatmid = input.submat(new Rect(sleeve_pointA, sleeve_pointB));
         Scalar sumColorsmid = Core.sumElems(areaMatmid);
-        double minColormid = Math.min(sumColorsmid.val[0], Math.min(sumColorsmid.val[1], sumColorsmid.val[2]));
+        double minColormid = Math.max(sumColorsmid.val[0], Math.min(sumColorsmid.val[1], sumColorsmid.val[2]));
 
         Mat areaMatright = input.submat(new Rect(rsleeve_pointA, rsleeve_pointB));
         Scalar sumColorsright = Core.sumElems(areaMatright);
-        double minColorright = Math.min(sumColorsright.val[0], Math.min(sumColorsright.val[1], sumColorsright.val[2]));
+        double minColorright = Math.max(sumColorsright.val[0], Math.min(sumColorsright.val[1], sumColorsright.val[2]));
 
         // Get the minimum RGB value from every single channel
 
@@ -89,16 +90,16 @@ public class SleeveDetection extends OpenCvPipeline {
                     input,
                     sleeve_pointA,
                     sleeve_pointB,
-                    CYAN,
+                    RED,
                     2
             );
-        } else if (sumColorsright.val[1] == minColorright) {
+        } else if (sumColorsright.val[0] == minColorright) {
             position = ParkingPosition.RIGHT;
             Imgproc.rectangle(
                     input,
                     rsleeve_pointA,
                     rsleeve_pointB,
-                    MAGENTA,
+                    RED,
                     2
             );
         } else {
