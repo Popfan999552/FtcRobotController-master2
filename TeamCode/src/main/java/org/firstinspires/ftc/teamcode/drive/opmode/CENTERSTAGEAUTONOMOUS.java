@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -80,6 +81,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
 
 
 
+
     static final double FEET_PER_METER = 3.28084;
 
     // Lens intrinsics
@@ -94,7 +96,10 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-    int ID_TAG_OF_INTEREST = 16; // Tag ID 16 from the 36h11 family
+    //int ID_TAG_OF_INTEREST = 18; // Tag ID 16 from the 36h11 family
+    int Left = 17;
+    int Middle = 18;
+    int Right =19;
 
     AprilTagDetection tagOfInterest = null;
     @Override
@@ -104,24 +109,32 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
         //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);  CENTERSTAGEMECHANUMDRIVE
 
         CENTERSTAGEROBOT drive = new CENTERSTAGEROBOT(hardwareMap);
-
+        telemetry.addData("finalX", 3);
         Trajectory trajToSpike = drive.trajectoryBuilder(new Pose2d())
                 .forward(2d)
                 .build();
         Trajectory trajSpikeToBb = drive.trajectoryBuilder(new Pose2d())
                 .forward(10d)
                 .build();
-        firstCamRunOpMode();
+        Trajectory right = drive.trajectoryBuilder(new Pose2d())
+                .strafeRight(3)
+                .build();
+        Trajectory left = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(3)
+                .build();
+        telemetry.addData("finalX", 2343);
+        opencvPixelDetector pixelDetector = new opencvPixelDetector();
+        ;
 
-        waitForStart();
+        while(!isStopRequested()){
+            pixelDetector.runOpMode();
 
-        if (isStopRequested()) return;
+        }
 
-        //drive.turn(Math.toRadians(ANGLE));
-
+        //camRunOpMode(drive);
+        //drive.followTrajectory();
         drive.followTrajectory(trajToSpike);
         //detect object and location
-        camRunOpMode(drive);
         drive.turn(90);
         drive.followTrajectory(trajSpikeToBb);
         //detect AprilTag
@@ -149,12 +162,8 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
 
     public void camRunOpMode(CENTERSTAGEROBOT drive)
     {
-        Trajectory right = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(3)
-                .build();
-        Trajectory left = drive.trajectoryBuilder(new Pose2d())
-                .strafeLeft(3)
-                .build();
+
+        waitForStart();
         telemetry.addData("reached",5);
         telemetry.update();
         //Servo servo = hardwareMap.servo.get("servoName");
@@ -190,8 +199,8 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
          */
         //while (!isStarted() && !isStopRequested())
         //{
-
-        while (!isStopRequested())
+        boolean stop=false;
+        while (!isStopRequested() && !stop)
         {
             telemetry.addData("reached",1);
             telemetry.update();
@@ -205,7 +214,7 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
 
                 for(AprilTagDetection tag : currentDetections)
                 {
-                    if(tag.id == ID_TAG_OF_INTEREST)
+                    if(tag.id == Left || tag.id == Middle || tag.id == Right)
                     {
                         tagOfInterest = tag;
                         tagFound = true;
@@ -220,6 +229,9 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
                 {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
+                    stop=true;
+                    break;
+
                 }
                 else
                 {
@@ -261,65 +273,30 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
          * The START command just came in: now work off the latest snapshot acquired
          * during the init loop.
          */
-
+        telemetry.addData("hihih",1234);
         /* Update the telemetry */
         if(tagOfInterest != null)
         {
             telemetry.addLine("Tag snapshot:\n");
             tagToTelemetry(tagOfInterest);
             telemetry.update();
+
         }
         else
         {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
+        telemetry.addData("hi",1);
 
-        /* Actually do something useful */
-        if(tagOfInterest == null)
-        {
-            /*
-             * Insert your autonomous code here, presumably running some default configuration
-             * since the tag was never sighted during INIT
-             */
+        if(tagOfInterest==null || tagOfInterest.id == Left) {
+
+            //left code
+        }else if (tagOfInterest.id == Middle){
+            //middle code
+        }else if (tagOfInterest.id == Right){
+            //right code
         }
-        else
-        {
-            /*
-             * Insert your autonomous code here, probably using the tag pose to decide your configuration.
-             */
-
-            // e.g.
-            if(tagOfInterest.pose.x <= 20)
-            {
-                telemetry.addData("less than 20", 3);
-                //servo.setPosition(0);
-                drive.followTrajectory(right);
-
-                return;
-                // do something
-            }
-            else if(tagOfInterest.pose.x >= 20 && tagOfInterest.pose.x <= 50)
-            {
-                //servo.setPosition(90);
-                telemetry.addData("between 20 and 50",3);
-
-                return;
-
-                // do something else
-            }
-            else if(tagOfInterest.pose.x >= 50)
-            {
-                telemetry.addData("over 50",3);
-
-                //servo.setPosition(180);
-                drive.followTrajectory(right);
-                return;
-                // do something else
-            }
-        }
-
-
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
         while (opModeIsActive()) {sleep(20);}
     }
@@ -338,179 +315,8 @@ public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
     }
 
 
-    public void firstCamRunOpMode()
-    {
-
-        telemetry.addData("reached",5);
-        telemetry.update();
-        //Servo servo = hardwareMap.servo.get("servoName");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
-
-        camera.setPipeline(aprilTagDetectionPipeline);
-
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-
-        {
-            @Override
-            public void onOpened()
-            {
-                telemetry.addData("reached",1);
-                telemetry.update();
-                camera.startStreaming(640,360, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode)
-            {
-
-            }
-        });
-
-        telemetry.setMsTransmissionInterval(50);
-
-        /*
-         * The INIT-loop:
-         * This REPLACES waitForStart!
-         */
-        //while (!isStarted() && !isStopRequested())
-        //{
-
-        while (!isStopRequested())
-        {
-            telemetry.addData("reached",1);
-            telemetry.update();
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
 
-
-            if(currentDetections.size() != 0)
-            {
-                boolean tagFound = false;
-
-                for(AprilTagDetection tag : currentDetections)
-                {
-                    if(tag.id == ID_TAG_OF_INTEREST)
-                    {
-                        tagOfInterest = tag;
-                        tagFound = true;
-                        break;
-                    }
-                }
-                if(tagOfInterest==null ) {
-                    telemetry.addData("hi",3);
-                    telemetry.update();
-                }
-                if(tagFound)
-                {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    tagToTelemetry(tagOfInterest);
-                }
-                else
-                {
-                    telemetry.addLine("Don't see tag of interest :(");
-
-                    if(tagOfInterest == null)
-                    {
-                        telemetry.addLine("(The tag has never been seen)");
-                    }
-                    else
-                    {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                        tagToTelemetry(tagOfInterest);
-                    }
-                }
-
-            }
-            else
-            {
-                telemetry.addLine("Don't see tag of interest :(");
-
-                if(tagOfInterest == null)
-                {
-                    telemetry.addLine("(The tag has never been seen)");
-                }
-                else
-                {
-                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                    tagToTelemetry(tagOfInterest);
-                }
-
-            }
-
-            telemetry.update();
-            sleep(20);
-        }
-
-        /*
-         * The START command just came in: now work off the latest snapshot acquired
-         * during the init loop.
-         */
-
-        /* Update the telemetry */
-        if(tagOfInterest != null)
-        {
-            telemetry.addLine("Tag snapshot:\n");
-            tagToTelemetry(tagOfInterest);
-            telemetry.update();
-        }
-        else
-        {
-            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-            telemetry.update();
-        }
-
-        /* Actually do something useful */
-        if(tagOfInterest == null)
-        {
-            /*
-             * Insert your autonomous code here, presumably running some default configuration
-             * since the tag was never sighted during INIT
-             */
-        }
-        else
-        {
-            /*
-             * Insert your autonomous code here, probably using the tag pose to decide your configuration.
-             */
-
-            // e.g.
-            if(tagOfInterest.pose.x <= 20)
-            {
-                telemetry.addData("less than 20", 3);
-                //servo.setPosition(0);
-                ID_TAG_OF_INTEREST=17;
-
-                return;
-                // do something
-            }
-            else if(tagOfInterest.pose.x >= 20 && tagOfInterest.pose.x <= 50)
-            {
-                //servo.setPosition(90);
-                telemetry.addData("between 20 and 50",3);
-                ID_TAG_OF_INTEREST=18;
-                return;
-
-                // do something else
-            }
-            else if(tagOfInterest.pose.x >= 50)
-            {
-                telemetry.addData("over 50",3);
-
-                //servo.setPosition(180);
-                ID_TAG_OF_INTEREST=19;
-
-                return;
-                // do something else
-
-            }
-        }
-
-
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
-    }
 
 
 }
