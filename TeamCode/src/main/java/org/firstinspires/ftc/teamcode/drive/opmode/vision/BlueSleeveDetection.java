@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.drive.opmode.vision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -17,7 +17,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class SleeveDetection extends OpenCvPipeline {
+public class BlueSleeveDetection extends OpenCvPipeline {
     /*
     YELLOW  = Parking Left
     CYAN    = Parking Middle
@@ -48,6 +48,7 @@ public class SleeveDetection extends OpenCvPipeline {
             BLUE    = new Scalar(0, 0, 255),
             BLACK = new Scalar(0, 0, 0);*/
     private final Scalar
+            BLUE  = new Scalar(255, 0, 0),
             RED  = new Scalar(255, 0, 0),
             YELLOW  = new Scalar(255, 255, 0),
             CYAN    = new Scalar(0, 255, 255),
@@ -95,22 +96,22 @@ public class SleeveDetection extends OpenCvPipeline {
 
         // Change the bounding box color based on the sleeve color
         //1 for green, 2 for red
-        if (sumColorsmid.val[0] == minColormid) {
+        if (sumColorsmid.val[2] == minColormid) {
             position = ParkingPosition.LEFT;
             Imgproc.rectangle(
                     input,
                     sleeve_pointA,
                     sleeve_pointB,
-                    RED,
+                    BLUE,
                     2
             );
-        } else if (sumColorsright.val[0] == minColorright) {
+        } else if (sumColorsright.val[2] == minColorright) {
             position = ParkingPosition.RIGHT;
             Imgproc.rectangle(
                     input,
                     rsleeve_pointA,
                     rsleeve_pointB,
-                    RED,
+                    BLUE,
                     2
             );
         } else {

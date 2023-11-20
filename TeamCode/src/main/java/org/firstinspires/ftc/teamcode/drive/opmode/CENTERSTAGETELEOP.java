@@ -58,12 +58,14 @@ public class CENTERSTAGETELEOP extends OpMode {
         rightServo = hardwareMap.servo.get("rightServo");
         bucketServo = hardwareMap.crservo.get("bucketServo");
 
+        //Intake motors
+        roller = hardwareMap.dcMotor.get("roller");
+
         //endgame servo
         droneLauncher = hardwareMap.servo.get("droneLauncher");
         scissorLift = hardwareMap.crservo.get("scissorLift");
 
-        //Intake motors
-        roller = hardwareMap.dcMotor.get("roller");
+
 
         //endgame motor
         //futureLeadScrew = hardwareMap.dcMotor.get("futureLeadScrew");
@@ -123,6 +125,7 @@ public class CENTERSTAGETELEOP extends OpMode {
         if(currentGamepad.b){
             winch1.setPower(1);
             winch2.setPower(1);
+
             double x=getRuntime();
             while(getRuntime()<getRuntime()+500){
 
@@ -150,11 +153,11 @@ public class CENTERSTAGETELEOP extends OpMode {
         }
 
         if(currentGamepad.x){
-            //release
-            droneLauncher.setPosition(0.7);
+            //retract
+            droneLauncher.setPosition(0.4);
         }
         if(currentGamepad.y){
-            //retract servo
+            //release servo
             droneLauncher.setPosition(0.7);
         }
         //Gamepad1: drive, hanging

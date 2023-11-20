@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -15,6 +16,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.opmode.SleeveDetection;
 import org.firstinspires.ftc.teamcode.drive.opmode.vision.AprilTagAutonomousInitDetectionExample;
 import org.firstinspires.ftc.teamcode.drive.opmode.vision.ApriltagDetector;
+import org.firstinspires.ftc.teamcode.drive.opmode.vision.BlueApriltagDetector;
+import org.firstinspires.ftc.teamcode.drive.opmode.vision.BlueSleeveDetection;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -22,19 +25,30 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 
 @Config
-@Autonomous(name = "Signal Sleeve Test")
+@Autonomous(name = "ShortBlueAuto")
 
-public class VisionTest extends LinearOpMode {
+public class ShortBlueAuto extends LinearOpMode {
 
    /* DcMotor slide;
     DcMotor intake;
 
     Servo v4b;*/
-
-    private SleeveDetection sleeveDetection;
+    DcMotor slides;
+    DcMotor futureVirtualFourBar;
+    //Intake motors
+    DcMotor roller;
+    //endgame motor
+    DcMotor futureLeadScrew;
+    DcMotor winch1;
+    DcMotor winch2;
+    //Outtake servos
+    Servo leftServo;
+    Servo rightServo;
+    CRServo bucketServo;
+    private BlueSleeveDetection blueSleeveDetection;
     private OpenCvCamera camera;
-    public ApriltagDetector apriltagDetector;
-    public SleeveDetection.ParkingPosition pixelpos;
+    public BlueApriltagDetector apriltagDetector;
+    public BlueSleeveDetection.ParkingPosition pixelpos;
 
     // Name of the Webcam to be set in the config
     private String webcamName = "Webcam 1";
@@ -51,6 +65,17 @@ public class VisionTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        //Outtake motors
+        slides = hardwareMap.dcMotor.get("slides");
+        //futureVirtualFourBar = hardwareMap.dcMotor.get("futureVirtualFourBar");
+
+        //Outtake servos
+        leftServo = hardwareMap.servo.get("leftServo");
+        rightServo = hardwareMap.servo.get("rightServo");
+        bucketServo = hardwareMap.crservo.get("bucketServo");
+
+        //Intake motors
+        roller = hardwareMap.dcMotor.get("roller");
         right = drive.trajectoryBuilder(new Pose2d())
                 .strafeRight(1)
                 .build();
@@ -65,7 +90,7 @@ public class VisionTest extends LinearOpMode {
                 .forward(2d+4)
                 .build();
         trajSpikeToBb = drive.trajectoryBuilder(new Pose2d())
-                .forward(2d+4)
+                .forward(2d)
                 .build();
 
         /*slide=hardwareMap.dcMotor.get("slide");
@@ -76,8 +101,8 @@ public class VisionTest extends LinearOpMode {
         //cv
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId);
-        sleeveDetection = new SleeveDetection();
-        camera.setPipeline(sleeveDetection);
+        blueSleeveDetection = new BlueSleeveDetection();
+        camera.setPipeline(blueSleeveDetection);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -90,11 +115,11 @@ public class VisionTest extends LinearOpMode {
             @Override
             public void onError(int errorCode) {}
         });
-        
+
         //v4b.setPosition(0);
         //slide.setPower(.2);
         sleep(1000);
-        telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
+        telemetry.addData("ROTATION: ", blueSleeveDetection.getPosition());
         drive.followTrajectory(trajToSpike);
         //SleeveDetection.ParkingPosition pixelpos = sleeveDetection.getPosition();
         /*while (!isStarted()) {
@@ -105,31 +130,33 @@ public class VisionTest extends LinearOpMode {
 
         waitForStart();
         //while (opModeIsActive()) {
-            telemetry.addData("ROTATION: ", sleeveDetection.getPosition());
-            telemetry.update();
-            sleep(100);
+        telemetry.addData("ROTATION: ", blueSleeveDetection.getPosition());
+        telemetry.update();
+        sleep(100);
         //}
-        pixelpos = sleeveDetection.getPosition();
+        pixelpos = blueSleeveDetection.getPosition();
 
-        if(pixelpos== SleeveDetection.ParkingPosition.LEFT){
-            drive.turn(-90);
+        if(pixelpos== BlueSleeveDetection.ParkingPosition.LEFT){
+
             drive.followTrajectory(trajToSpike);
+            drive.turn(-90);
+            //intake.setPower(0.1);
+            drive.turn(-180);
+
             drive.followTrajectory(trajSpikeToBb);
 
-
-            //intake.setPower(0.1);
-        } else if(pixelpos== SleeveDetection.ParkingPosition.CENTER){
+        } else if(pixelpos== BlueSleeveDetection.ParkingPosition.CENTER){
             drive.followTrajectory(trajToSpike);
             drive.turn(180);
-            drive.followTrajectory(trajSpikeToBb);
             //intake.setPower(0.1);
-
-        }   else if(pixelpos== SleeveDetection.ParkingPosition.RIGHT){
-            drive.followTrajectory(trajToSpike);
             drive.turn(90);
             drive.followTrajectory(trajSpikeToBb);
-            //intake.setPower(0.1);
 
+        }   else if(pixelpos== BlueSleeveDetection.ParkingPosition.RIGHT){
+            drive.followTrajectory(trajToSpike);
+            drive.turn(90);
+            //intake.setPower(0.1);
+            drive.followTrajectory(trajSpikeToBb);
 
         }
         apriltagDetector.runOpMode();
@@ -144,7 +171,11 @@ public class VisionTest extends LinearOpMode {
                 break;
             }
         }
-
+        slides.setPower(1);
+        leftServo.setPosition(0);
+        rightServo.setPosition(0);
+        sleep(1000);
+        bucketServo.setPower(1);
         //park in all of them
 
         telemetry.update();
