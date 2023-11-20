@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Demonstrates an empty iterative OpMode
  */
 @TeleOp(name = "Concept: NullOp", group = "Concept")
-@Disabled
+
 public class ConceptNullOp extends OpMode {
 
   private ElapsedTime runtime = new ElapsedTime();

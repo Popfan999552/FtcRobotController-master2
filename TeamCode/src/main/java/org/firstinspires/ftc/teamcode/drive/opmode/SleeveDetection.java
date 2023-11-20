@@ -32,15 +32,15 @@ public class SleeveDetection extends OpenCvPipeline {
     }
 
     // TOPLEFT anchor point for the bounding box
-    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(0, 20);
+    private static Point SLEEVE_TOPLEFT_ANCHOR_POINT = new Point(320, 0);
 
-    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(100, 20);
+    private static Point rSLEEVE_TOPLEFT_ANCHOR_POINT = new Point(0, 0);
     // Width and height for the bounding box
-    public static int REGION_WIDTH = 90;
-    public static int REGION_HEIGHT = 10;
+    public static int REGION_WIDTH = 320;
+    public static int REGION_HEIGHT = 360;
 
-    public static int rREGION_WIDTH = 90;
-    public static int rREGION_HEIGHT = 10;
+    public static int rREGION_WIDTH = 320;
+    public static int rREGION_HEIGHT = 360;
 
     // Color definitions
     /*private final Scalar
@@ -85,15 +85,16 @@ public class SleeveDetection extends OpenCvPipeline {
 
         Mat areaMatmid = input.submat(new Rect(sleeve_pointA, sleeve_pointB));
         Scalar sumColorsmid = Core.sumElems(areaMatmid);
-        double minColormid = Math.min(sumColorsmid.val[0], Math.min(sumColorsmid.val[1], sumColorsmid.val[2]));
+        double minColormid = Math.max(sumColorsmid.val[0], Math.max(sumColorsmid.val[1], sumColorsmid.val[2]));
 
         Mat areaMatright = input.submat(new Rect(rsleeve_pointA, rsleeve_pointB));
         Scalar sumColorsright = Core.sumElems(areaMatright);
-        double minColorright = Math.min(sumColorsright.val[0], Math.min(sumColorsright.val[1], sumColorsright.val[2]));
+        double minColorright = Math.max(sumColorsright.val[0], Math.max(sumColorsright.val[1], sumColorsright.val[2]));
 
         // Get the minimum RGB value from every single channel
 
         // Change the bounding box color based on the sleeve color
+        //1 for green, 2 for red
         if (sumColorsmid.val[0] == minColormid) {
             position = ParkingPosition.CENTER;
             Imgproc.rectangle(

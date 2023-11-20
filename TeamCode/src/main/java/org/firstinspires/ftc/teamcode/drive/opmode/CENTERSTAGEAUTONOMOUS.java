@@ -70,7 +70,7 @@ import java.util.ArrayList;
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
-@Disabled
+
 @Autonomous(group = "drive")
 public class CENTERSTAGEAUTONOMOUS extends LinearOpMode {
     public static double d = 11.5; // in

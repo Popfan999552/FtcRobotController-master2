@@ -10,32 +10,35 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.CENTERSTAGEROBOT;
-@Disabled
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
 @TeleOp(group = "drive")
 public class CENTERSTAGETELEOP extends OpMode {
     Gamepad previousGamepad;
     Gamepad currentGamepad;
-    CENTERSTAGEROBOT drive = new CENTERSTAGEROBOT(hardwareMap);
-    //DcMotor slide=drive.getSlide(hardwareMap);
-    //Servo v4b=drive.getV4b(hardwareMap);
-    float slidePower =0;
-    float v4bPos=90;
-    Trajectory forward = drive.trajectoryBuilder(new Pose2d())
-            .forward(5)
-            .build();
-    Trajectory backward = drive.trajectoryBuilder(new Pose2d())
-            .back(5)
-            .build();
-    Trajectory right = drive.trajectoryBuilder(new Pose2d())
-            .strafeRight(5)
-            .build();
-    Trajectory left = drive.trajectoryBuilder(new Pose2d())
-            .strafeLeft(5)
-            .build();
-
+    SampleMecanumDrive drive;
+    Trajectory forward;
+    Trajectory backward;
+    Trajectory left;
+    Trajectory right;
     @Override
     public void init() {
+        drive = new SampleMecanumDrive(hardwareMap);
+        previousGamepad=gamepad1;
+        currentGamepad=gamepad1;
 
+        forward = drive.trajectoryBuilder(new Pose2d())
+                .forward(5)
+                .build();
+        backward = drive.trajectoryBuilder(new Pose2d())
+                .back(5)
+                .build();
+        right = drive.trajectoryBuilder(new Pose2d())
+                .strafeRight(5)
+                .build();
+        left = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(5)
+                .build();
 
 
 
@@ -74,6 +77,7 @@ public class CENTERSTAGETELEOP extends OpMode {
 
         }*/
         //motion
+        drive.followTrajectory(forward);
         if(!previousGamepad.dpad_up && currentGamepad.dpad_up){
             drive.followTrajectory(forward);
 

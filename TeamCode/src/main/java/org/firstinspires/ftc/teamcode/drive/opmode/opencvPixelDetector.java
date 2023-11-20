@@ -37,8 +37,8 @@ import java.util.List;
  */
 
 @Autonomous(name= "opencvSkystoneDetector", group="Sky autonomous")
-@Disabled
-public class opencvPixelDetector extends LinearOpMode {
+
+public class  opencvPixelDetector extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     //0 means skystone, 1 means yellow stone
