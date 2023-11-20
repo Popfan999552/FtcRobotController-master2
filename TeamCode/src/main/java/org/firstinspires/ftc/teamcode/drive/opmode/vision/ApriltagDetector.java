@@ -23,6 +23,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -37,9 +38,10 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @TeleOp
-public class ApriltagDetector extends LinearOpMode
+public class ApriltagDetector //extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -64,6 +66,14 @@ public class ApriltagDetector extends LinearOpMode
     int ID_TAG_OF_INTEREST = 18; // Tag ID 18 from the 36h11 family
 
     AprilTagDetection tagOfInterest = null;
+
+    HardwareMap myHardwareMap;
+    LinearOpMode myLinearOpMode;
+    public ApriltagDetector(LinearOpMode linearOpMode){
+        myLinearOpMode=linearOpMode;
+        myHardwareMap=linearOpMode.hardwareMap;
+
+    }
     public AprilTagDetection setTagOfInterest(String color, SleeveDetection.ParkingPosition pixelpos) {
 
         if(pixelpos==SleeveDetection.ParkingPosition.RIGHT && color == "blue") {
@@ -83,7 +93,7 @@ public class ApriltagDetector extends LinearOpMode
             ID_TAG_OF_INTEREST=6;
 
         }
-        while (!isStarted() && !isStopRequested())
+        while (!myLinearOpMode.isStarted() && !myLinearOpMode.isStopRequested())
         {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -103,21 +113,21 @@ public class ApriltagDetector extends LinearOpMode
 
                 if(tagFound)
                 {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                    myLinearOpMode.telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
                     return tagOfInterest;
                 }
                 else
                 {
-                    telemetry.addLine("Don't see tag of interest :(");
+                    myLinearOpMode.telemetry.addLine("Don't see tag of interest :(");
 
                     if(tagOfInterest == null)
                     {
-                        telemetry.addLine("(The tag has never been seen)");
+                        myLinearOpMode.telemetry.addLine("(The tag has never been seen)");
                     }
                     else
                     {
-                        telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                        myLinearOpMode.telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
                         tagToTelemetry(tagOfInterest);
                     }
                 }
@@ -125,36 +135,36 @@ public class ApriltagDetector extends LinearOpMode
             }
             else
             {
-                telemetry.addLine("Don't see tag of interest :(");
+                myLinearOpMode.telemetry.addLine("Don't see tag of interest :(");
 
                 if(tagOfInterest == null)
                 {
-                    telemetry.addLine("(The tag has never been seen)");
+                    myLinearOpMode.telemetry.addLine("(The tag has never been seen)");
                 }
                 else
                 {
-                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                    myLinearOpMode.telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
                     tagToTelemetry(tagOfInterest);
                 }
 
             }
 
-            telemetry.update();
-            sleep(20);
+            myLinearOpMode.telemetry.update();
+            myLinearOpMode.sleep(20);
         }
 
 
         /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
+
         return tagOfInterest;
     }
 
-    @Override
     public void runOpMode()
     {
+        //hwmap where??
         //Servo servo = hardwareMap.servo.get("servoName");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        int cameraMonitorViewId = myHardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", myHardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(myHardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -173,7 +183,8 @@ public class ApriltagDetector extends LinearOpMode
             }
         });
 
-        telemetry.setMsTransmissionInterval(50);
+        //myLinearOpMode.telemetry.setMsTransmissionInterval(50);
+        //myLinearOpMode.waitForStart();
 
         /*
          * The INIT-loop:
@@ -247,14 +258,14 @@ public class ApriltagDetector extends LinearOpMode
     void tagToTelemetry(AprilTagDetection detection)
     {
         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
-        Servo servo = hardwareMap.servo.get("servoName");
-        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
-        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
-        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
+        Servo servo = myHardwareMap.servo.get("servoName");
+        myLinearOpMode.telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        myLinearOpMode.telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        myLinearOpMode.telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        myLinearOpMode.telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        myLinearOpMode.telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
+        myLinearOpMode.telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
+        myLinearOpMode.telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
     }
     public double getTranslationX(AprilTagDetection detection){
         return detection.pose.x*FEET_PER_METER;

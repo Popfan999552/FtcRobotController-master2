@@ -43,8 +43,8 @@ public class LongBlueAuto extends LinearOpMode {
     DcMotor winch1;
     DcMotor winch2;
     //Outtake servos
-    Servo leftServo;
-    Servo rightServo;
+    CRServo leftServo;
+    CRServo rightServo;
     CRServo bucketServo;
 
     private BlueSleeveDetection blueSleeveDetection;
@@ -72,8 +72,8 @@ public class LongBlueAuto extends LinearOpMode {
         //futureVirtualFourBar = hardwareMap.dcMotor.get("futureVirtualFourBar");
 
         //Outtake servos
-        leftServo = hardwareMap.servo.get("leftServo");
-        rightServo = hardwareMap.servo.get("rightServo");
+        leftServo = hardwareMap.crservo.get("leftServo");
+        rightServo = hardwareMap.crservo.get("rightServo");
         bucketServo = hardwareMap.crservo.get("bucketServo");
 
         //Intake motors
@@ -174,10 +174,15 @@ public class LongBlueAuto extends LinearOpMode {
             }
         }
         slides.setPower(1);
-        leftServo.setPosition(0);
-        rightServo.setPosition(0);
+        leftServo.setPower(-1);
+        rightServo.setPower(-1);
         sleep(1000);
         bucketServo.setPower(1);
+
+        leftServo.setPower(-1);
+        rightServo.setPower(-1);
+        sleep(1000);
+        slides.setPower(1);
         //park in all of them
 
         telemetry.update();

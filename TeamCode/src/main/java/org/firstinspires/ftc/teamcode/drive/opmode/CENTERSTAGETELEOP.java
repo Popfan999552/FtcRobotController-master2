@@ -30,8 +30,8 @@ public class CENTERSTAGETELEOP extends OpMode {
     DcMotor winch1;
     DcMotor winch2;
     //Outtake servos
-    Servo leftServo;
-    Servo rightServo;
+    CRServo leftServo;
+    CRServo rightServo;
     CRServo bucketServo;
     //endgame servo
     Servo droneLauncher;
@@ -54,8 +54,8 @@ public class CENTERSTAGETELEOP extends OpMode {
         //futureVirtualFourBar = hardwareMap.dcMotor.get("futureVirtualFourBar");
 
         //Outtake servos
-        leftServo = hardwareMap.servo.get("leftServo");
-        rightServo = hardwareMap.servo.get("rightServo");
+        leftServo = hardwareMap.crservo.get("leftServo");
+        rightServo = hardwareMap.crservo.get("rightServo");
         bucketServo = hardwareMap.crservo.get("bucketServo");
 
         //Intake motors
@@ -64,8 +64,6 @@ public class CENTERSTAGETELEOP extends OpMode {
         //endgame servo
         droneLauncher = hardwareMap.servo.get("droneLauncher");
         scissorLift = hardwareMap.crservo.get("scissorLift");
-
-
 
         //endgame motor
         //futureLeadScrew = hardwareMap.dcMotor.get("futureLeadScrew");
@@ -110,8 +108,16 @@ public class CENTERSTAGETELEOP extends OpMode {
         } else{
             slides.setPower(0);
         }
-        rightServo.setPosition(currentGamepad.left_trigger);
-        leftServo.setPosition(currentGamepad.left_trigger);
+        if(currentGamepad.dpad_left){
+            rightServo.setPower(1);
+            leftServo.setPower(-1);
+        } else if(currentGamepad.dpad_right){
+        rightServo.setPower(-1);
+        leftServo.setPower(1);
+        } else{
+            rightServo.setPower(0);
+            leftServo.setPower(0);
+        }
         if(currentGamepad.dpad_right){
             bucketServo.setPower(1);
         } else if(currentGamepad.dpad_left){
@@ -190,25 +196,39 @@ public class CENTERSTAGETELEOP extends OpMode {
 
         }*/
         //motion
-        drive.followTrajectory(forward);
-        if(!previousGamepad.dpad_up && currentGamepad.dpad_up){
+        //drive.followTrajectory(forward);
+        if(currentGamepad.left_stick_y>0.9){
             drive.followTrajectory(forward);
 
-        } else if (!previousGamepad.dpad_down && currentGamepad.dpad_down){
+        } else if (currentGamepad.left_stick_y<-0.9){
 
             drive.followTrajectory(backward);
 
-        }else if (!previousGamepad.dpad_left && currentGamepad.dpad_left){
+        }else if (currentGamepad.left_stick_x<-0.9){
 
             drive.followTrajectory(left);
 
-        }else if (!previousGamepad.dpad_right && currentGamepad.dpad_right){
+        }else if (currentGamepad.left_stick_y>0.9){
 
             drive.followTrajectory(right);
 
         }
-
-
+        telemetry.addData("righttrigger", currentGamepad.right_trigger);
+        telemetry.addData("rightbumper", currentGamepad.right_bumper);
+        telemetry.addData("leftbumper", currentGamepad.left_bumper);
+        telemetry.addData("lefttrigger", currentGamepad.left_trigger);
+        telemetry.addData("dpadup", currentGamepad.dpad_up);
+        telemetry.addData("dpaddown", currentGamepad.dpad_down);
+        telemetry.addData("dpadleft", currentGamepad.dpad_left);
+        telemetry.addData("dpadright", currentGamepad.dpad_right);
+        telemetry.addData("joyleftX", currentGamepad.dpad_up);
+        telemetry.addData("joyrightX", currentGamepad.dpad_down);
+        telemetry.addData("joyleftY", currentGamepad.dpad_left);
+        telemetry.addData("joyrightX", currentGamepad.dpad_right);
+        telemetry.addData("a",currentGamepad.a);
+        telemetry.addData("b",currentGamepad.b);
+        telemetry.addData("x",currentGamepad.x);
+        telemetry.addData("y",currentGamepad.y);
 
     }
 }
